@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- Declare leagueStateTrackerApp as the starting Angular module. -->
-<html class="no-js">
+<html class="no-js" ng-app="LeagueStatTrackerApp">
 <head>
   <meta charset="utf-8">
   <title>League Stat Tracker</title>
@@ -9,7 +9,7 @@
 
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.css">
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
 
   <!-- Holder JS -->
   <script src="../node_modules/holderjs/holder.js"></script>
@@ -18,10 +18,24 @@
   <script src="../node_modules/jquery/dist/jquery.js"></script>
   <script src="../node_modules/angular/angular.js"></script>
   <script src="../node_modules/angular-route/angular-route.js"></script>
-  <script src=""></script>
 </head>
-<body>
-  <h1>League Stat Tracker</h1>
-  <p>Hello World!</p>
+<!-- Define Angular controller. -->
+<body ng-controller="mainController">
+  <!-- Header and navbar. -->
+  <header>
+    <navbar></navbar>
+  </header>
+
+  <!-- Main content and injected views. -->
+  <div class="container" id="main">
+    <!-- {{ message }} -->
+    <span ng-bind="message"></span>
+
+    <!-- Takes required files based on route and injects into the main layout.-->
+    <div ng-view></div>
+  </div>
+
+
+  <script src="js/app.js"></script>
 </body>
 </html>
