@@ -1,0 +1,67 @@
+/* EXIT ANIMATIONS */
+@keyframes scaleDown {
+  from  { opacity: 0; -webkit-transform: scale(-0.8); }
+}
+
+/* Rotate and fall */
+@keyframes rotateFall {
+  0%    { transform: rotateZ(0deg); }
+  20%   { transform: rotateZ(10deg); animation-timing-function: ease-out }
+  40%   { transform: rotateZ(17deg); }
+  60%   { transform: rotateZ(16deg); }
+  100%  { transform: translateY(100%) rotateZ(17deg); }
+}
+
+/* Slide out from left */
+@keyframes slideOutLeft {
+  to    { transform: translateX(-100%); }
+}
+
+/* Slide out from bottom */
+@keyframes slideOutUp {
+  to    { transform: translateY(-100%); }
+}
+
+/* Rotate out newspaper */
+@keyframes rotateOutNewspaper {
+  to    { transform: translateZ(-3000px) rotateZ(360deg); opacity: 0; }
+}
+
+/* ENTRY ANIMATIONS */
+/* Scale up */
+@keyframes scaleUp {
+  from  { opacity: 0.3; -webkit-transform: scale(0.8); }
+}
+
+/* Slide in from right */
+@keyframes slideInRight {
+  from  { transform: translateX(100%); }
+  to    { transform: translateX(0); }
+}
+
+/* Slide in from bottom */
+@keyframes slideInUp {
+  from  { transform: translateY(100%); }
+  to    { transform: translateY(0); }
+}
+
+/* Slide in from top */ 
+@keyframes slideInDown {
+  from  { transform: translateY(-100%); }
+  to    { transform: translateY(0); }
+}
+
+.ng-enter {
+  z-index: 3000;
+}
+.ng-leave {
+  z-index: 4000;
+}
+
+.page-summoner.ng-enter {
+  animation: slideInRight 0.5s both ease-in; 
+}
+
+.page-summoner.ng-leave {
+  animation: slideOutLeft 0.5s both ease-in;
+}

@@ -1,0 +1,4 @@
+/* Makes sure navbar is on top of everything else. */
+header nav.navbar {
+  z-index: 9000;
+}
