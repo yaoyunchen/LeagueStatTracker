@@ -1,11 +1,13 @@
-// MODULES
-// -------
+// // MODULES
+// // -------
 var express         = require('express');
 var mongoose        = require('mongoose');
 var morgan          = require('morgan');
 var bodyParser      = require('body-parser');
 var methodOverride  = require('method-override');
 var app             = express();
+
+require('dotenv').config();
 
 // PORT
 // ----
@@ -14,7 +16,7 @@ var port = process.env.PORT || 3000;
 // EXPRESS CONFIGURATION
 // Sets the connection to MongoDB.
 // -------------------------------
-mongoose.connect("mongodb://localhost/LeagueStatTrackerApp");
+//mongoose.connect("mongodb://localhost/LeagueStatTrackerApp");
 
 // CONFIG FILES
 // ------------
@@ -29,6 +31,7 @@ mongoose.connect("mongodb://localhost/LeagueStatTrackerApp");
 app.use(express.static(__dirname + '/public'));
 //// Use node modules.
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
+
 //// Log with Morgan.
 app.use(morgan('dev'));
 
@@ -38,13 +41,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 //// Allows bodyParser to look at raw text.
 app.use(bodyParser.text());
-//// Prase application/vdn.api+json as json.
+//// Parse application/vdn.api+json as json.
 app.use(bodyParser.json({type: 'application/vnd.api+json'}));
 app.use(methodOverride());
 
-// ROUTES
-// ------
-//require('./app/routes.js')(app);
+// // ROUTES
+// // ------
+// require('./app/routes.js')(app);
+
 
 // APP STARTUP
 // Start up app at http://localhost:3000.
@@ -52,4 +56,4 @@ app.use(methodOverride());
 app.listen(port);
 console.log('App listening on port', port);
 
-//exports = module.exports = app;
+module.exports = app;

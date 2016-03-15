@@ -1,25 +1,116 @@
+<div class="row" ng-controller="summonerController">
+  <div class="col-sm-12">
+    <h1>Summoner Stats</h1>
+  </div>
+</div>
+
+<form role="form">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="input-group">
+        <div class="input-group-btn">
+            <select class="btn btn-primary" 
+              id="repeatSelect"
+              name="repeatSelect" 
+              ng-model="regions.selectedOption" 
+              ng-options="option.name for option in regions.availableOptions track by option.id"
+            >
+            </select>
+        </div>
+        <input type="text" class="form-control"
+          id="summoner-search"
+          ng-model="searchName"
+          placeholder="Enter summoner name."
+        >
+        <div class="input-group-btn">
+          <button class="btn btn-primary"
+            ng-click="summonerSearch()"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
 <div class="row">
   <div class="col-sm-12">
-    <h1><span ng-bind="name"></span> Stats</h1>
+    <tabset>
+      <tab heading="Info">
+        <p>
+          Summoner Name: <span ng-bind="summoner.value.name"></span>
+        <p>
+        <p>
+          Summoner ID: <span ng-bind="summoner.value.id"></span>
+        </p>
+        <p>
+          Summoner Level: <span ng-bind="summoner.value.summonerLevel"></span>
+        </p>
+        <p>
+          Summoner Icon: <img ng-src="{{ iconUrl }}" alt=""/>
+        </p>
+      </tab>
+
+      <tab heading="Stats">
+        <p>
+          Team Builder
+          <p>{{ summoner.stats[0].wins }}</p>
+          <p>{{ summoner.stats[0].aggregatedStats.totalChampionKills }}</p>
+          <p>{{ summoner.stats[0].aggregatedStats.totalMinionKills }}</p>
+          <p>{{ summoner.stats[0].aggregatedStats.totalTurretsKilled }}</p>
+          <p>{{ summoner.stats[0].aggregatedStats.totalNeutralMinionsKilled }}</p>
+          <p>{{ summoner.stats[0].aggregatedStats.totalAssists}}</p>
+          <p>{{ summoner.stats[1] }}</p>
+        </p>
+        <p>
+          Coop VS AI
+          {{ summoner.stats[1] }}
+        </p>
+        <p>
+          Dominion
+          {{ summoner.stats[2]}}
+        </p>
+        <p>
+          Ranked Premade 5
+          {{ summoner.stats[3]}}
+        </p>
+        <p>
+          Ranked Solo
+          {{ summoner.stats[4]}}
+        </p>
+        <p>
+          Ranked Team 5
+          {{ summoner.stats[5]}}
+        </p>
+        <p>
+          Summoner's Rift
+          {{ summoner.stats[6]}}
+        </p>
+        <p>
+          Twisted Treeline
+          {{ summoner.stats[7]}}
+        </p>
+        <p>
+          ARAM
+          {{ summoner.stats[8]}}
+        </p>
+      </tab>
+
+      <tab heading="Recent">
+        <p>Recent: {{ summoner.recent }}</p>
+      </tab>
+
+      <tab heading="Runes">
+        <p>Runes: {{ summoner.runes }}</p>
+      </tab>
+
+      <tab heading="Masteries">
+        <p>Masteries: {{ summoner.masteries }}</p>
+      </tab>
+    </tabset>
   </div>
 </div>
 
 
-  <form role="form">
-    <div class="row">
-      <div class="col-sm-12">
-        <div class="input-group">
-          <input type="text" class="form-control"
-            id="summoner-search"
-            ng-model="summoner-search"
-            placeholder="Enter summoner name."
-          >
-          <div class="input-group-btn">
-            <button class="btn btn-primary" type="submit" >Search</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
-
-
+            

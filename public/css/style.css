@@ -2,3 +2,17 @@
 header nav.navbar {
   z-index: 9000;
 }
+
+/* Used to style the drop down select for selecting region. */
+select {
+  height: 34px;
+}
+
+/* Styling for the tabs */
+.nav-tabs > li, .nav-pills > li {
+  float:      none;
+  display:    inline-block;
+}
+.nav-tabs, .nav-pills {
+  text-align: center;
+}
