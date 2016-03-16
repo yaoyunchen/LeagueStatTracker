@@ -1,0 +1,117 @@
+<div class="row">
+  <div class="col-sm-3 profile-icon">
+    <img class="img-rounded"
+      ng-src="{{ iconUrl }}"
+      alt="" 
+    />
+  </div>
+  <div class="col-sm-9 summoner-info">
+    <table class="table table-inverse table-borderless">
+      <tbody>
+        <tr>
+          <td class="col-sm-3">Summoner Name:</td>
+          <td class="col-sm-3" ng-bind="summoner.value.name"></td>
+          <td class="col-sm-3">Division:</td>
+          <td class="col-sm-3">
+            {{ summoner.rank[summoner.value.id].name ? summoner.rank[summoner.value.id].name : 'N/A' }}
+          </td>
+        </tr>
+        <tr>
+          <td class="col-sm-3">ID:</td>
+          <td class="col-sm-3" ng-bind="summoner.value.id"></td>
+          <td class="col-sm-3">Rank:</td>
+          <td class="col-sm-3">
+            {{ summoner.rank[summoner.value.id].tier ? summoner.rank[summoner.value.id].tier + ' ' + summoner.rank[summoner.value.id].entries[0].division + ' LP: ' + summoner.rank[summoner.value.id].entries[0].leaguePoints : 'N/A' }}
+          </td>
+        </tr>
+        <tr>
+          <td  class="col-sm-3">Level:</td>
+          <td class="col-sm-3" ng-bind="summoner.value.summonerLevel"></td>
+          <td  class="col-sm-3">Ranked W/L:</td>
+          <td class="col-sm-3"> 
+            {{ summoner.rank[summoner.value.id].entries[0].wins ? 'W: ' + summoner.rank[summoner.value.id].entries[0].wins + ' L: ' + summoner.rank[summoner.value.id].entries[0].losses : 'N/A' }} 
+          </td>
+        </tr>
+        <tr>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<hr/>
+<div class="row">
+  <div class="col-sm-12 summoner-stat-btns">
+    <button class="btn btn-warning"
+      ng-click="getData('wins')"
+    >Wins</button>
+    <button class="btn btn-warning"
+      ng-click="getData('totalchampionkills')"
+    >Champion Kills</button>
+    <button class="btn btn-warning"
+      ng-click="getData('totalassists')"
+    >Assists</button>
+    <button class="btn btn-warning"
+      ng-click="getData('totalturretskilled')"
+    >Turrets Destroyed</button>
+    <button class="btn btn-warning"
+      ng-click="getData('totalminionkills')"
+    >Minion Kills</button>
+    <button class="btn btn-warning"
+      ng-click="getData('totalneutralminionskilled')"
+    >Neutral Minion Kills</button>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12 summoner-stats">
+    
+    <div class='chart'
+      data-ac-chart="'bar'" 
+      data-ac-data="data" 
+      data-ac-config="config"
+    >
+    </div>
+
+
+
+    <!-- <p>{{ summoner.stats[0].wins }}</p>
+    <p>{{ summoner.stats[0].aggregatedStats.totalChampionKills }}</p>
+    <p>{{ summoner.stats[0].aggregatedStats.totalMinionKills }}</p>
+    <p>{{ summoner.stats[0].aggregatedStats.totalTurretsKilled }}</p>
+    <p>{{ summoner.stats[0].aggregatedStats.totalNeutralMinionsKilled }}</p>
+    <p>{{ summoner.stats[0].aggregatedStats.totalAssists}}</p>
+    <p>{{ summoner.stats[0] }}</p>
+  </p>  
+  <p>
+    Coop VS AI
+    {{ summoner.stats[1] }}
+  </p>
+  <p>
+    Dominion
+    {{ summoner.stats[2]}}
+  </p>
+  <p>
+    Ranked Premade 5
+    {{ summoner.stats[3]}}
+  </p>
+  <p>
+    Ranked Solo
+    {{ summoner.stats[4]}}
+  </p>
+  <p>
+    Ranked Team 5
+    {{ summoner.stats[5]}}
+  </p>
+  <p>
+    Summoner's Rift
+    {{ summoner.stats[6]}}
+  </p>
+  <p>
+    Twisted Treeline
+    {{ summoner.stats[7]}}
+  </p>
+  <p>
+    ARAM
+    {{ summoner.stats[8]}}
+  </p> -->
+  </div>
+</div>

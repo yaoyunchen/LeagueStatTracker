@@ -1,7 +1,8 @@
 // Create the LeagueStatTrackerApp module.
 // ngRoute handles routing, allows for this to be single page app.
 // ngAnimate allows adding transitions and animations.
-var LeagueStatTrackerApp = angular.module('LeagueStatTrackerApp', ['ngRoute', 'ngAnimate', ]);
+var LeagueStatTrackerApp = angular.module('LeagueStatTrackerApp', ['ngRoute', 'ngAnimate', 'angularCharts']);
+
 
 // Configure routes.
 LeagueStatTrackerApp.config(function($routeProvider){
@@ -18,74 +19,6 @@ LeagueStatTrackerApp.config(function($routeProvider){
     })
 });
 
-// DIRECTIVES
-// Represents a navbar widget.
-LeagueStatTrackerApp.directive('navbar', function() {
-  return {
-    // Restricted to being an element.
-    restrict: 'E',
-    // Directive will insert any content included between <navbar></navbar>.
-    transclude: true,
-    scope: { },
-    templateUrl: 'views/navbar.html'
-  }
-});
-
-// Represents a single pane in the tabs widget.
-LeagueStatTrackerApp.directive('tab', function() {
-  return {
-    restrict: 'E',
-    transclude: true,
-    // Specify HTML template string to be insterted into the DOM when the element directive is used.
-    // ng-show will automatically show active tabs.
-    template: '<div role="tabpanel" ng-show="active" ng-transclude></div>',
-    // '^' instructs directive to move up the scope heirarchy one level and look for the controller on tabset.
-    require: '^tabset',
-    // Tells directive what scope to use with properties that will be bound to the directive's isolated scope and be available for use inside the directive.
-    scope: {
-      // '@' symbol means scope property must be a string.
-      heading: '@'
-    },
-    // Specify linking function.
-    link: function(scope, elem, attr, tabsetCtrl) {
-      // Sets all tabs as inactive when they begin.
-      scope.active = false;
-      tabsetCtrl.addTab(scope);
-    }
-  }
-});
-
-// Used to wrap multiple tabs and provide the logic needed to select which tab is shown.
-LeagueStatTrackerApp.directive('tabset', function() {
-  return {
-    restrict: 'E',
-    transclude: true,
-    scope: { },
-    templateUrl: './views/tabset.html',
-    bindToController: true,
-    controllerAs: 'tabset',
-    controller: function() {
-      var self = this;
-      self.tabs = [];
-      self.addTab = function addTab(tab) {
-        self.tabs.push(tab);
-        if (self.tabs.length === 1) {
-          tab.active = true;
-        }
-      }
-      self.select = function(selectedTab) {
-        angular.forEach(self.tabs, function(tab) {
-          if (tab.active && tab != selectedTab) {
-            tab.active = false;
-          }
-        })
-        selectedTab.active = true;
-      }
-    }
-  }
-});
-
-
 // CONTROLLERS
 // Create the controllers and inject Angular's scope.
 // -----------
@@ -93,10 +26,10 @@ LeagueStatTrackerApp.controller('mainController', function($scope) {
 });
 
 //Summoners controller.  Used for looking up summoner stats.
-LeagueStatTrackerApp.controller('summonerController', ['$scope', '$summoner', function($scope, $summoner) {
+LeagueStatTrackerApp.controller('summonerController', ['$scope', '$summoner', function($scope, $summoner, API_KEY) {
   $scope.pageClass = "page-summoner";
 
-  $scope.apiKey = 'YOUR_API_KEY';
+  $scope.apiKey = "YOUR_API_KEY";
 
   $scope.regions = {
     repeatSelect: null,
@@ -114,140 +47,211 @@ LeagueStatTrackerApp.controller('summonerController', ['$scope', '$summoner', fu
     ],
     selectedOption: {id: '7', name: 'na'}
   };
-
   $scope.searchName = '';
+  
   $scope.iconUrl = "http://ddragon.leagueoflegends.com/cdn/6.5.1/img/profileicon/0.png"
-  $scope.summonerSearch = function() {
-    // Should connect to back and to do the search.
-    $scope.summoner = $summoner.get($scope.searchName, $scope.regions.selectedOption.name, $scope.apiKey, function() {
-      $scope.getStats();
-      $scope.getRecent();
-      $scope.getRunes();
-      $scope.getMasteries();
 
-      $scope.iconUrl = "http://ddragon.leagueoflegends.com/cdn/6.5.1/img/profileicon/" + $scope.summoner.value.profileIconId + ".png"
-    });
+
+
+  $scope.summonerSearch = function(isValid) {
+    if (isValid) {
+      // Should connect to back end to do the search.
+      $scope.summoner = $summoner.get($scope.searchName, $scope.regions.selectedOption.name,  $scope.apiKey, function() {
+        $scope.getStats();
+        $scope.getRank();
+        $scope.getRecent();
+        $scope.getRunes();
+        $scope.getMasteries();
+        $scope.iconUrl = "http://ddragon.leagueoflegends.com/cdn/6.5.1/img/profileicon/" + $scope.summoner.value.profileIconId + ".png"
+      });
+    }
   };
 
-  $scope.getStats = function() {
-    $scope.summoner.stats = $summoner.getStats($scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey);
+  $scope.getStats = function(callback) {
+    $scope.summoner.stats = $summoner.getStats($scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey, function(){
+      $scope.getData("wins");
+    });
+  };
+  
+  $scope.getRank = function() {
+    $scope.summoner.rank = $summoner.getRank(
+      $scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey);
   };
 
   $scope.getRecent = function() {
-    $scope.summoner.recent = $summoner.getRecent($scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey);
+    $scope.summoner.recent = $summoner.getRecent($scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey);
   };
 
   $scope.getRunes = function() {
-    $scope.summoner.runes = $summoner.getRunes($scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey);
+    $scope.summoner.runes = $summoner.getRunes($scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey);
   };
 
   $scope.getMasteries = function() {
-    $scope.summoner.masteries = $summoner.getMasteries($scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey);
+    $scope.summoner.masteries = $summoner.getMasteries($scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey);
   };
-}]);
 
-
-
-
-
-// FACTORIES
-// ---------
-// Should be able to refactor into a separate .js file.
-LeagueStatTrackerApp.factory('$summoner', ['$http', '$q', function($http, $q) {
-  "use strict";
-  return {
-    get: function(summonerName, region, key, callback) {
-      var deferred = $q.defer();
-      var summoner = {};
-      var path = "https://na.api.pvp.net/api/lol/" + region + "/v1.4/summoner/by-name/"+ summonerName + "?api_key=" + key;
-
-      $http.get(path)
-      .then(function(res) {
-        return angular.fromJson(res.data);
-      })
-      .then(function(res) {
-        var key;
-        for (key in res) {
-          if (res.hasOwnProperty(key)) {
-            deferred.resolve((summoner[key] = res[key]));
-          }
-        }
-        if (callback) {
-          callback();
-        }
-      });
-
-      return deferred.promise.$$state;
-    },
-
-    getStats: function(summonerID, region, key) {
-      var stats = [];
-
-      var path = "https://" + region + ".api.pvp.net/api/lol/" + region + "/v1.3/stats/by-summoner/" + summonerID +"/summary?api_key=" + key;
-
-      $http.get(path)
-      .then(function(res) {
-        return angular.fromJson(res.data);
-      })
-      .then(function(res) {
-        var responses = res.playerStatSummaries
-        for (var i=0; i < responses.length; i++) {
-          stats[i] = responses[i];
-        }
-      });
-      return stats;
-    },
-
-    getRecent: function(summonerID, region, key) {
-      var recent = [];
-      var path = "https://" + region + ".api.pvp.net/api/lol/" + region + "/v1.3/game/by-summoner/" + summonerID +"/recent?api_key=" + key;
-
-      $http.get(path)
-      .then(function(res) {
-        return angular.fromJson(res.data);
-      })
-      .then(function(res) {
-        var responses = res.games
-        for (var i=0; i < responses.length; i++) {
-          recent[i] = responses[i];
-        }
-      });
-      return recent;
-    },
-
-    getRunes: function(summonerID, region, key) {
-      var runes = [];
-      var path = "https://" + region + ".api.pvp.net/api/lol/" + region + "/v1.4/summoner/" + summonerID + "/runes?api_key=" + key;
-      $http.get(path)
-      .then(function(res) {
-        return angular.fromJson(res.data);
-      })
-      .then(function(res) {
-        var responses = res[summonerID].pages
-        for (var i=0; i < responses.length; i++) {
-          runes[i] = responses[i];
-        }
-      });
-      return runes;
-    },
-
-    getMasteries: function(summonerID, region, key) {
-      var masteries = [];
-      var path = "https://" + region + ".api.pvp.net/api/lol/" + region + "/v1.4/summoner/" + summonerID + "/masteries?api_key=" + key;
-      $http.get(path)
-      .then(function(res) {
-        return angular.fromJson(res.data);
-      })
-      .then(function(res) {
-        var responses = res[summonerID].pages
-        for (var i=0; i < responses.length; i++) {
-          masteries[i] = responses[i];
-        }
-      });
-      return masteries;
+  $scope.getData = function(type) {
+    if ($scope.searchName == '') {
+      return false;
     }
+    $scope.config = {
+      title: type,
+      tooltips: true,
+      labels: true,
+      // mouseover: function() {},
+      // mouseout: function() {},
+      // click: function() {},
+      // legend: {
+      //   display: true,
+      //   position: 'left' //or right
+      // },
+      // colors: [],
+      isAnimate: true
+    };
+
+    var series = [];
+    var data =  [];
+    // This should be put into database.
+    var gametypes = [
+      {
+        type: "CAP5x5",
+        name: "Team Builder",
+        code: "TB"
+      },
+      {
+        type: "CoopVsAI",
+        name: "Coop 5 v 5",
+        code: "COOP5"
+      }, 
+      {
+        type: "CoopVsAI3x3",
+        name: "Coop 3 v 3",
+        code: "COOP3"
+      },
+      {
+        type: "OdinUnranked",
+        name: "Dominion",
+        code: "DOM"
+      },
+      {
+        type: "RankedTeam3x3",
+        name: "Ranked 3 v 3",
+        code: "R3"
+      },
+      {
+        type: "RankedTeam5x5",
+        name: "Ranked Team",
+        code: "RTeam"
+      },
+      {
+        type: "Unranked3x3",
+        name: "Twisted Treeline",
+        code: "TT"
+      },
+      {
+        type: "RankedSolo5x5",
+        name: "Ranked Solo",
+        code: "R1"
+      },
+      {
+        type: "AramUnranked5x5",
+        name: "All Random All Mid",
+        code: "ARAM"
+      },
+      {
+        type: "Unranked",
+        name: "Normal",
+        code: "NORM"
+      },
+      {
+        type: "RankedPremade5x5",
+        name: "Ranked 5 v 5",
+        code: "R5"
+      }
+    ];
+
+    var stats = $scope.summoner.stats;
+    var gameIndex;
+    for (var i = 0; i < stats.length; i++) {
+
+      for (var j = 0; j < gametypes.length ; j++) {
+        if (stats[i].playerStatSummaryType == gametypes[j].type) {
+          gameIndex = j;
+          break;
+        }
+      }
+      series.push(gametypes[gameIndex].name)
+
+      var yData;
+      switch(type) {
+        case 'wins':
+          if (stats[i].hasOwnProperty('wins')) {
+            yData = stats[i].wins; 
+          } else {
+            yData = 0;
+          }
+
+          break;
+        case 'totalchampionkills':
+          if (stats[i].aggregatedStats.hasOwnProperty('totalChampionKills')) { 
+            yData = stats[i].aggregatedStats.totalChampionKills;
+          } else {
+            yData = 0;
+          }
+          break;
+        case 'totalneutralminionskilled':
+          if (stats[i].aggregatedStats.hasOwnProperty('totalNeutralMinionsKilled')) { 
+            yData = stats[i].aggregatedStats.totalNeutralMinionsKilled;
+          } else {
+            yData = 0;
+          }
+          break;
+        case 'totalminionkills':
+          if (stats[i].aggregatedStats.hasOwnProperty('totalMinionKills')) { 
+            yData = stats[i].aggregatedStats.totalMinionKills;
+          } else {
+            yData = 0;
+          }
+          break;
+        case 'totalassists':
+          if (stats[i].aggregatedStats.hasOwnProperty('totalAssists')) { 
+            yData = stats[i].aggregatedStats.totalAssists;
+          } else {
+            yData = 0;
+          }
+          break;
+        case 'totalturretskilled':
+          if (stats[i].aggregatedStats.hasOwnProperty('totalTurretsKilled')) { 
+            yData = stats[i].aggregatedStats.totalTurretsKilled;
+          } else {
+            yData = 0;
+          }
+          break;
+        default:
+          yData = 0;
+      }
+
+      var dataset = {
+        x: gametypes[gameIndex].code,
+        y: [yData],
+        tooltip: gametypes[gameIndex].name
+      };
+      data.push(dataset);
+    }
+
+
+    $scope.data = {
+      series: series,
+      data: data
+    };
   }
 }]);
+
+
+
+
+
+
 
 
 
