@@ -1,7 +1,10 @@
+// var mongoose = require('mongoose');
+// require('../app/models/model.js');
+// mongoose.connect("mongodb://localhost/LeagueStatTrackerApp");
 // Create the LeagueStatTrackerApp module.
 // ngRoute handles routing, allows for this to be single page app.
 // ngAnimate allows adding transitions and animations.
-var LeagueStatTrackerApp = angular.module('LeagueStatTrackerApp', ['ngRoute', 'ngAnimate', 'angularCharts']);
+var LeagueStatTrackerApp = angular.module('LeagueStatTrackerApp', ['ngRoute', 'ngAnimate', 'ngDialog', 'angularCharts']);
 
 
 // Configure routes.
@@ -20,16 +23,55 @@ LeagueStatTrackerApp.config(function($routeProvider){
 });
 
 // CONTROLLERS
-// Create the controllers and inject Angular's scope.
-// -----------
-LeagueStatTrackerApp.controller('mainController', function($scope) {
-});
+LeagueStatTrackerApp.controller('mainController', ['$scope', '$champions', '$location', function($scope, $champions, $location) {
+
+  $scope.pageClass = "page-home";
+  $scope.apiKey = "YOUR_KEY";
+
+  $scope.regions = {
+    repeatSelect: null,
+    availableOptions: [
+      {id: '1', name: 'br'},
+      {id: '2', name: 'eune'},
+      {id: '3', name: 'euw'},
+      {id: '4', name: 'kr'},
+      {id: '5', name: 'lan'},
+      {id: '6', name: 'las'},
+      {id: '7', name: 'na'},
+      {id: '8', name: 'oce'},
+      {id: '9', name: 'ru'},
+      {id: '10', name: 'tr'}
+    ],
+    selectedOption: {id: '7', name: 'na'}
+  };
+
+  $scope.go = function(path) {
+    $location.path(path);
+  }
+
+
+  $scope.freeChamps = $champions.getFree($scope.apiKey, function() {
+    $scope.getChampImages();
+  });
+
+  $scope.getChampImages = function() {
+    var images = [];
+    for (var i = 0; i < $scope.freeChamps.value.length; i ++) {
+
+      $scope.img = $champions.getChampImages($scope.apiKey, $scope.freeChamps.value[i].id);
+      images.push($scope.img);
+    }
+    $scope.freeChamps.images = images;
+  };
+
+}]);
+
 
 //Summoners controller.  Used for looking up summoner stats.
-LeagueStatTrackerApp.controller('summonerController', ['$scope', '$summoner', function($scope, $summoner, API_KEY) {
-  $scope.pageClass = "page-summoner";
+LeagueStatTrackerApp.controller('summonerController', ['$scope', '$summoner', function($scope, $summoner, ngDialog) {
 
-  $scope.apiKey = "YOUR_API_KEY";
+  $scope.pageClass = "page-summoner";
+  $scope.apiKey = "YOUR_KEY";
 
   $scope.regions = {
     repeatSelect: null,
@@ -48,18 +90,17 @@ LeagueStatTrackerApp.controller('summonerController', ['$scope', '$summoner', fu
     selectedOption: {id: '7', name: 'na'}
   };
   $scope.searchName = '';
-  
+  $scope.summoner;
   $scope.iconUrl = "http://ddragon.leagueoflegends.com/cdn/6.5.1/img/profileicon/0.png"
-
 
 
   $scope.summonerSearch = function(isValid) {
     if (isValid) {
-      // Should connect to back end to do the search.
-      $scope.summoner = $summoner.get($scope.searchName, $scope.regions.selectedOption.name,  $scope.apiKey, function() {
+        // Should connect to back end to do the search.
+      $scope.summoner = $summoner.get($scope.searchName, $scope.regions.selectedOption.name, $scope.apiKey, function() {
         $scope.getStats();
-        $scope.getRank();
         $scope.getRecent();
+        $scope.getRank();
         $scope.getRunes();
         $scope.getMasteries();
         $scope.iconUrl = "http://ddragon.leagueoflegends.com/cdn/6.5.1/img/profileicon/" + $scope.summoner.value.profileIconId + ".png"
@@ -68,26 +109,80 @@ LeagueStatTrackerApp.controller('summonerController', ['$scope', '$summoner', fu
   };
 
   $scope.getStats = function(callback) {
-    $scope.summoner.stats = $summoner.getStats($scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey, function(){
-      $scope.getData("wins");
+    $scope.summoner.stats = $summoner.getStats($scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey, function(){
+      $scope.getData("wins");      
     });
   };
   
   $scope.getRank = function() {
     $scope.summoner.rank = $summoner.getRank(
-      $scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey);
+      $scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey);
   };
 
-  $scope.getRecent = function() {
-    $scope.summoner.recent = $summoner.getRecent($scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey);
+  $scope.getRecent = function(callback) {
+    $scope.summoner.recent = $summoner.getRecent($scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey, function(){
+      $scope.getChamp();
+    });
   };
+
+  $scope.getChamp = function() {
+    for (var i = 0; i < $scope.summoner.recent.length; i++) {
+
+      // Get the two teams and add to the recent.
+      var teams = {
+        teamOne: [],
+        teamTwo: []
+      }
+      
+      // Get the id and champion of other summoners in the game.
+      $scope.summoner.recent[i].fellowPlayers.forEach(function(player) {
+        $scope.summoner.champ = $summoner.getChamp(player.championId, $scope.regions.selectedOption.name, $scope.apiKey)
+        if (player.teamId == 100) {
+          teams.teamOne.push(
+            {
+              "id": player.summonerId,
+              "champ": $scope.summoner.champ
+            }
+          )
+        } else if (player.teamId == 200) {
+          teams.teamTwo.push(
+            {
+              "id": player.summonerId,
+              "champ": $scope.summoner.champ
+            }
+          )
+        }
+      })
+
+      // Get the summoner's id and champion onto the right team.
+      if ($scope.summoner.recent[i].teamId == 100) {
+        $scope.summoner.recent[i].champ = $summoner.getChamp($scope.summoner.recent[i].championId, $scope.regions.selectedOption.name, $scope.apiKey)
+        teams.teamOne.push(
+          {
+            "id": $scope.summoner.value.id,
+            "champ": $scope.summoner.recent[i].champ
+          }
+        )
+      }  else {
+        $scope.summoner.recent[i].champ = $summoner.getChamp($scope.summoner.recent[i].championId, $scope.regions.selectedOption.name, $scope.apiKey)
+        teams.teamTwo.push(
+          {
+            "id": $scope.summoner.value.id, 
+            "champ": $scope.summoner.recent[i].champ
+          }
+        )
+      } 
+
+      $scope.summoner.recent[i].teams = teams;
+    }
+  }
 
   $scope.getRunes = function() {
-    $scope.summoner.runes = $summoner.getRunes($scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey);
+    $scope.summoner.runes = $summoner.getRunes($scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey);
   };
 
   $scope.getMasteries = function() {
-    $scope.summoner.masteries = $summoner.getMasteries($scope.summoner.value.id, $scope.regions.selectedOption.name,  $scope.apiKey);
+    $scope.summoner.masteries = $summoner.getMasteries($scope.summoner.value.id, $scope.regions.selectedOption.name, $scope.apiKey);
   };
 
   $scope.getData = function(type) {
@@ -246,12 +341,6 @@ LeagueStatTrackerApp.controller('summonerController', ['$scope', '$summoner', fu
     };
   }
 }]);
-
-
-
-
-
-
 
 
 

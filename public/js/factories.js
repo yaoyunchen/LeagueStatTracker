@@ -16,7 +16,7 @@ LeagueStatTrackerApp.factory('$summoner', ['$http', '$q', function($http, $q) {
         var key;
         for (key in res) {
           if (res.hasOwnProperty(key)) {
-            deferred.resolve((summoner[key] = res[key]));
+            deferred.resolve(summoner[key] = res[key]);
           }
         }
         if (callback) {
@@ -68,7 +68,7 @@ LeagueStatTrackerApp.factory('$summoner', ['$http', '$q', function($http, $q) {
       return rank;
     },
 
-    getRecent: function(summonerID, region, key) {
+    getRecent: function(summonerID, region, key, callback) {
       var recent = [];
       var path = "https://" + region + ".api.pvp.net/api/lol/" + region + "/v1.3/game/by-summoner/" + summonerID +"/recent?api_key=" + key;
 
@@ -81,8 +81,29 @@ LeagueStatTrackerApp.factory('$summoner', ['$http', '$q', function($http, $q) {
         for (var i=0; i < responses.length; i++) {
           recent[i] = responses[i];
         }
+        if (callback) {
+          callback();
+        }
       });
       return recent;
+    },
+
+    
+    getChamp: function(champId, region, key) {
+      var deferred = $q.defer();
+      var champ = [];
+      // Gets the image URL of the champion. API call to League's static database, does not count towards call limit.  
+      var imgPath = "https://global.api.pvp.net/api/lol/static-data/" + region + "/v1.2/champion/" + champId + "?champData=image&api_key=" + key;
+      
+      $http.get(imgPath)
+      .then(function(res) {
+        return angular.fromJson(res.data);
+      })
+      .then(function(res) {
+        deferred.resolve(champ = res);
+      });
+      
+      return deferred.promise.$$state;
     },
 
     getRunes: function(summonerID, region, key) {
@@ -93,7 +114,7 @@ LeagueStatTrackerApp.factory('$summoner', ['$http', '$q', function($http, $q) {
         return angular.fromJson(res.data);
       })
       .then(function(res) {
-        var responses = res[summonerID].pages
+        var responses = res[summonerID].pages;
         for (var i=0; i < responses.length; i++) {
           runes[i] = responses[i];
         }
@@ -115,6 +136,45 @@ LeagueStatTrackerApp.factory('$summoner', ['$http', '$q', function($http, $q) {
         }
       });
       return masteries;
+    }
+  }
+}]);
+
+
+LeagueStatTrackerApp.factory('$champions', ['$http', '$q', function($http, $q) {
+  "use strict";
+  return {
+    getFree: function(key, callback) {
+      var deferred = $q.defer();
+      var champs = [];
+      var path = "https://na.api.pvp.net/api/lol/na/v1.2/champion?freeToPlay=true&api_key=" + key;
+      $http.get(path)
+      .then(function(res) {
+        return angular.fromJson(res.data);
+      })
+      .then(function(res) {
+        deferred.resolve(champs = res.champions);
+        if (callback) {
+            callback();
+        }
+      });
+
+      return deferred.promise.$$state;
+    },
+
+    getChampImages: function(key, id) {
+      var deferred = $q.defer();
+      var imageID = [];
+      var path = "https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion/" + id + "?champData=image&api_key=" + key;
+      $http.get(path)
+      .then(function(res) {
+        return angular.fromJson(res.data);
+      })
+      .then(function(res) {
+        deferred.resolve(imageID = res.key);
+      });
+
+      return deferred.promise.$$state;
     }
   }
 }]);

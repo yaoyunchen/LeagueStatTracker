@@ -1,3 +1,4 @@
+/* Used to set the same background image for all pages. */
 body {
   background:               url('../img/summoner-info-bg.jpg') no-repeat center fixed;
   -webkit-background-size:  cover;
@@ -5,17 +6,45 @@ body {
   -o-background-size:       cover;
   background-size:          cover;
   color:                    #f2ae44;
+  font-family:              "Times New Roman", Times, serif
+}
+
+/* Sets the container div so it will clear the navbar. */
+.container {
+  position:                 absolute;
+  top:                      50px;
+  width:                    100%;
+  height:                   100%;
+  text-align:               center;
+}
+
+
+/* Sets the injected page view display. */
+.page {
+  left:                     0;
+  bottom:                   0;
+  position:                 absolute;
+  width:                    100%;
+  height:                   100%;
+}
+/* Consistent headings for all pages */
+.page h1 {
+  margin:                   10px;
+  text-align:               center;
+  font-size:                3em; 
+  color:                    #f2ae44;
 }
 
 /* Used as a seperator between divs. */
 hr {
-  border-top:     1px solid #f09d1f;
-  margin:         5px 0 5px 0;
+  border-top:               1px solid #f09d1f;
+  margin:                   5px 0 5px 0;
 }
 
 /* Makes sure navbar is on top of everything else. */
 header nav.navbar {
   z-index:                  9000;
+  margin:                   0;
 }
 
 /* Used to style the drop down select for selecting region. */
@@ -24,6 +53,11 @@ select {
 }
 
 /* Styling for the tabs */
+.tab {
+  width:                    100%;
+  display:                  table;
+  float:                    none;
+}
 .nav-tabs > li, .nav-pills > li {
   float:                    none;
   display:                  inline-block;
@@ -39,9 +73,6 @@ select {
   background-color:         #f2ae44;
   border: none;
 }
-.tab {
-  display:                  table;
-  float:                    none;
-}
+
 
 

@@ -1,0 +1,8 @@
+<div class="jumbotron jumbotron-slideshow">
+  <div class="slideshow"
+    ng-repeat="img in images"
+    ng-class="{ visible: active_image == $index }" 
+    ng-style="{ 'background-image': 'url(' + img + ')' }">
+  </div>
+  <h2 ng-bind="champName"></h2>
+</div>

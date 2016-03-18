@@ -7,7 +7,8 @@ var bodyParser      = require('body-parser');
 var methodOverride  = require('method-override');
 var app             = express();
 
-require('dotenv').config();
+//require('dotenv').config();
+
 
 // PORT
 // ----
@@ -16,7 +17,7 @@ var port = process.env.PORT || 3000;
 // EXPRESS CONFIGURATION
 // Sets the connection to MongoDB.
 // -------------------------------
-//mongoose.connect("mongodb://localhost/LeagueStatTrackerApp");
+mongoose.connect("mongodb://localhost/LeagueStatTrackerApp");
 
 // CONFIG FILES
 // ------------
@@ -32,8 +33,8 @@ app.use(express.static(__dirname + '/public'));
 //// Use node modules.
 app.use('/node_modules', express.static(__dirname + '/node_modules'));
 
-//// Log with Morgan.
-app.use(morgan('dev'));
+// //// Log with Morgan.
+// app.use(morgan('dev'));
 
 //// Parse application/json.
 app.use(bodyParser.json());

@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table table-inverse">
+      <tbody>
+        <tr class="modal-table">
+          <td>Player</td>
+          <td>{{ player.id }}</td>
+        </tr>
+        <tr class="modal-table">
+          <td>Champion</td>
+          <td>{{ player.champ.value.name }}, {{ player.champ.value.title }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12 champ-load-img">
+    <img ng-src="http://ddragon.leagueoflegends.com/cdn/img/champion/loading/{{ player.champ.value.key }}_0.jpg"/>
+  </div>
+</div>
+
+ 

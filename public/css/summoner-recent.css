@@ -1,0 +1,37 @@
+/* Centers text within the recent tab. */
+.summoner-recent, .champ-load-img {
+  text-align:       center;
+}
+
+/* Sets table layout and font. */
+.summoner-recent > table {
+  table-layout:     fixed;
+  word-wrap:        break-word;
+  margin:           auto;
+  font-size:        1em;
+}
+.summoner-recent > table > tbody > tr > td {
+  vertical-align:   middle;
+}
+
+/* Sets icon size when displaying champions for team one and team two. */
+.champ-icon {
+  width:            45px;
+  height:           45px;
+}
+
+.champ-icon-link > img:hover {
+  -webkit-filter:   brightness(200%); 
+  filter:           brightness(200%);
+}
+
+/* Centers the champion loading screen image in the modal, and add a shadow. */
+.champ-load-img > img {
+  width:            50%;
+  box-shadow:       9px 9px 7px rgba(0,0,0,0.3)
+}
+
+/* Sets the modal window's font color for the columns. */
+.modal-table > td {
+  color:            #FFFFFF;
+}

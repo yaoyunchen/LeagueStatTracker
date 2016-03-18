@@ -51,17 +51,13 @@
   to    { transform: translateY(0); }
 }
 
-.ng-enter {
-  z-index: 3000;
+/* Sets the animation when page changes. */
+.page-home.ng-enter, .page-summoner.ng-enter {
+  animation:  slideInRight 0.5s both ease-in; 
+  z-index:    3000;
 }
-.ng-leave {
-  z-index: 4000;
+.page-home.ng-leave, .page-summoner.ng-leave {
+  animation:  slideOutLeft 0.5s both ease-in;
+  z-index:    4000;
 }
 
-.page-summoner.ng-enter {
-  animation: slideInRight 0.5s both ease-in; 
-}
-
-.page-summoner.ng-leave {
-  animation: slideOutLeft 0.5s both ease-in;
-}

@@ -40,11 +40,13 @@
 }
 
 
+
 .summoner-stat-btns {
   text-align:     center;
 }
-
-
+.stat-btn {
+  margin-bottom:  5px;
+}
 
 .ac-chart {
   text-align:     center;
@@ -60,5 +62,3 @@
   fill:           white;
   fill-opacity:   50%;
 }
-
-
